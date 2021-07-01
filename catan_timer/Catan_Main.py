@@ -7,11 +7,12 @@ import os
 
 
 class player:
-	def __init__(self, inp_name, init_time, inp_id):
+	def __init__(self, inp_name, init_time, inp_id, inp_color):
 		self.name = inp_name
 		self.time_left = init_time #time in seconds
 		self.id  = inp_id
 		self.active = 1
+		self.color = inp_color
 	def __str__(self):
 		return "{:d}:{:12} - {:02d}:{:02d}".format(self.id, self.name,floor(self.time_left/60), floor(self.time_left%60))
 
@@ -49,7 +50,6 @@ class game:
 			self.next_turn(it+1)
 
 	def prev_turn(self, it = 0):
-		print("HEYEYe")
 		if it == self.num_players:
 			self.in_progress = 0
 			return
@@ -78,13 +78,18 @@ class game:
 		while 1:
 			self.scr.clear()
 			time_elapsed = int(time.time()) - game_start
-			self.scr.addstr(0,0, "total Time elapsed - {:d}:{:02d}\n".format(int(time_elapsed/60), time_elapsed % 60), curses.color_pair(3))
-			self.scr.addstr("{}'s turn {:d}\n{}".format(self.players[self.cur_turn].name, self.num_turns, self.status))
+			self.scr.addstr(0,0, "total Time elapsed - {:d}:{:02d}\n".format(int(time_elapsed/60), time_elapsed % 60))
+			self.scr.addstr("{}'s turn {:d}\n".format(self.players[self.cur_turn].name, self.num_turns))
+			if self.status == "RUNNING":
+				self.scr.addstr(self.status, curses.color_pair(GREEN_COLOR))
+			else:
+				self.scr.addstr(self.status, curses.color_pair(RED_COLOR))
+	
 			for player in self.players:
 				if player.active:
-					self.scr.addstr(player.id * 2 + 4, 0, str(player), curses.color_pair(2))
+					self.scr.addstr(player.id * 2 + 4, 0, str(player), curses.color_pair(player.color))
 				else:
-					self.scr.addstr(player.id * 2 + 4, 0, str(player), curses.color_pair(1))
+					self.scr.addstr(player.id * 2 + 4, 0, "XXXXX" + str(player) + "XXXXX", curses.color_pair(player.color))
 			self.scr.refresh()
 			time.sleep(1)
 
@@ -127,15 +132,47 @@ if __name__ == "__main__":
 	#os.system("pip3 install")
 	time_to_start_with = float(sys.argv[1]) #time in minutes per player
 	players = []
-	for i, name in enumerate(sys.argv[2:]):
-		players.append(player(name, int(time_to_start_with * 60), i + 1 ))
+	BROWN_COLOR  = 1
+	RED_COLOR 	 = 2
+	GREEN_COLOR  = 3
+	ORANGE_COLOR = 4
+	WHITE_COLOR  = 5
+	BLUE_COLOR 	 = 6
+	DEFAULT_COLOR= 7
+	for i, play in enumerate(sys.argv[2:]):
+		name, color = play.split(',')
+		color = color.lower()
+		if color == "brown":
+			color_code = BROWN_COLOR
+		elif color == "green":
+			color_code = GREEN_COLOR
+		elif color == "red":
+			color_code = RED_COLOR
+		elif color == "orange":
+			color_code = ORANGE_COLOR
+		elif color == "white":
+			color_code = WHITE_COLOR
+		elif color == "blue":
+			color_code = BLUE_COLOR
+		else:
+			print(color + "is not an acceptable color")
+			print("Acceptable colors are brown, green, red, orange, white, blue and is case sensitive")
+			sys.exit()
+		players.append(player(name, int(time_to_start_with * 60), i + 1, color_code))
 	game = game(players)
 	game.scr = curses.initscr()
 	curses.noecho()
 	curses.start_color()
-	curses.init_pair(1, curses.COLOR_RED, curses.COLOR_BLACK)
-	curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
-	curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_BLACK)
+
+
+	curses.init_pair(RED_COLOR, curses.COLOR_RED, curses.COLOR_BLACK)
+	curses.init_pair(GREEN_COLOR, curses.COLOR_GREEN, curses.COLOR_BLACK)
+	curses.init_pair(WHITE_COLOR, curses.COLOR_WHITE, curses.COLOR_BLACK)
+	curses.init_pair(BLUE_COLOR, curses.COLOR_BLUE, curses.COLOR_BLACK)
+	curses.init_pair(ORANGE_COLOR, curses.COLOR_YELLOW, curses.COLOR_BLACK)
+	curses.init_pair(BROWN_COLOR, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
+	curses.init_pair(DEFAULT_COLOR, curses.COLOR_WHITE, curses.COLOR_BLACK)
+
 	curses.cbreak()
 	game.setup()
 	game.play()

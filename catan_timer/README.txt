@@ -3,13 +3,14 @@ Pre-run:
 	
 Starting the program:
     To run the catan timer, run the following command
-    ./Catan_Timer <time> [<players>]
+    ./Catan_Timer <time> [<player_name>,<player_color>]
     	where:
     	<time> is the abount of time in minutes for each player
-    	[<players>] is a list separated by spaces of the names in turn order
+    	[<player_name>,<player_color>] is a list separated by spaces of name,color pairs
+		Acceptable colors are brown, green, red, orange, white, blue and is case sensitive
     
     ex. 1
-    	./Catan_Timer 10 Casey Zeb Dante
+    	./Catan_Timer 10 Casey,brown Zeb,red Dante,blue
     		creates a 10 minute game (each player has 10 minutes) with order 1. Casey 2. Zeb 3. Dante
     
 Controls:
