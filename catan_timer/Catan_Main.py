@@ -3,8 +3,7 @@ import sys
 from math import floor
 import time
 import threading	
-
-
+import os
 
 
 class player:
@@ -42,6 +41,7 @@ class game:
 	def next_turn(self, it = 0):
 		if it == self.num_players:
 			self.in_progress = 0
+			return
 		self.cur_turn = (self.cur_turn + 1) % len(self.players)
 		if self.cur_turn == 0:
 			self.num_turns = self.num_turns + 1
@@ -49,10 +49,13 @@ class game:
 			self.next_turn(it+1)
 
 	def prev_turn(self, it = 0):
+		print("HEYEYe")
 		if it == self.num_players:
 			self.in_progress = 0
+			return
 		self.cur_turn = (self.cur_turn - 1)
 		if self.cur_turn < 0:
+			print("first ig")
 			self.cur_turn = len(self.players) - 1
 			self.num_turns = self.num_turns - 1
 		if self.players[self.cur_turn].active == 0:
@@ -104,12 +107,13 @@ class game:
 	def input_func(self):
 		while 1:
 			inp = self.scr.getch()
-			print(inp)
 			if inp == 127:
 				self.status = "PAUSED"
-			elif inp == 68:
+			elif inp == 97:
 				self.prev_turn()
-			elif inp == 66:
+			elif inp == 100:
+				self.next_turn()
+			elif inp in [66, 115]:
 				self.in_progress = 0
 			elif self.status == "PAUSED":
 				self.cur_turn_time = int(time.time())
@@ -117,8 +121,10 @@ class game:
 				self.status = "RUNNING"
 			else:
 				self.next_turn()
+			time.sleep(.1)
 
 if __name__ == "__main__":
+	#os.system("pip3 install")
 	time_to_start_with = float(sys.argv[1]) #time in minutes per player
 	players = []
 	for i, name in enumerate(sys.argv[2:]):
@@ -130,6 +136,7 @@ if __name__ == "__main__":
 	curses.init_pair(1, curses.COLOR_RED, curses.COLOR_BLACK)
 	curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
 	curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_BLACK)
+	curses.cbreak()
 	game.setup()
 	game.play()
 	curses.endwin()
