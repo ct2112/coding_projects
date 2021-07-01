@@ -55,7 +55,6 @@ class game:
 			return
 		self.cur_turn = (self.cur_turn - 1)
 		if self.cur_turn < 0:
-			print("first ig")
 			self.cur_turn = len(self.players) - 1
 			self.num_turns = self.num_turns - 1
 		if self.players[self.cur_turn].active == 0:
